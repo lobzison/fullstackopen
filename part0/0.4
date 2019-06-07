@@ -1,0 +1,10 @@
+browser -> server: HTTP POST fullstack-exampleapp.herokuapp.com/new_note note: ${data}
+server --> browser: 301 redirect to fullstack-exampleapp.herokuapp.com/notes
+browser -> server: HTPP GET fullstack-exampleapp.herokuapp.com/notes
+server-->browser: 200 with html
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+server-->browser: 200 with main.css
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.js
+server-->browser: 200 with main.js
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+server-->browser: 200 with data.json
