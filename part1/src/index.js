@@ -1,27 +1,44 @@
-import React from 'react'
+import React, {useState} from 'react'
 import ReactDOM from 'react-dom'
 
 
-const Hello = (props) => {
+const Hello = ({name, age}) => {
+  const bornYear = () => new Date().getFullYear() - age
+
   return (
     <div>
-      <p>Hello {props.name}, you are {props.age}</p>
+      <p>Hello {name}, you are {age}</p>
+      <p>Probably born in {bornYear()}</p>
     </div>
   )
 }
 
-const App = () => {
-  const name = "BEter"
-  const age = 9
+const Display = ({value}) => <div>{value}</div>
+
+const Button = ({onClick, text}) => (
+  <button onClick={onClick}>
+    {text}
+  </button>
+)
+
+
+const App = props => {
+  const [value, setValue] = useState(10)
+
+  const updateVal = (val) => () => setValue(val)
 
   return (
     <div>
-      <h1>Greetings</h1>
-      <Hello name="BENIS" age="9"/>
-      <Hello name="SPURDO" age={age}/>
-      <Hello name={name} age = {6 + 9}/>
+      <Display value={value}/>
+      <Button onClick={updateVal(1000)} text="set to 1k" />
+      <Button onClick={updateVal(0)} text="set to zero" />
+      <Button onClick={updateVal(value + 1)} text="increment" />
+
     </div>
   )
 }
 
-ReactDOM.render(<App />, document.getElementById('root'))
+ReactDOM.render(
+  <App />, 
+  document.getElementById('root')
+)
