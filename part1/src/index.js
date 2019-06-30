@@ -1,44 +1,43 @@
-import React, {useState} from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 
+const notes = [
+  {
+    id: 1,
+    content: 'HTML is easy',
+    date: '2019-05-30T17:30:31.098Z',
+    important: true
+  },
+  {
+    id: 2,
+    content: 'Browser can execute only Javascript',
+    date: '2019-05-30T18:39:34.091Z',
+    important: false
+  },
+  {
+    id: 3,
+    content: 'GET and POST are the most important methods of HTTP protocol',
+    date: '2019-05-30T19:20:14.298Z',
+    important: true
+  }
+]
 
-const Hello = ({name, age}) => {
-  const bornYear = () => new Date().getFullYear() - age
-
-  return (
-    <div>
-      <p>Hello {name}, you are {age}</p>
-      <p>Probably born in {bornYear()}</p>
-    </div>
-  )
-}
-
-const Display = ({value}) => <div>{value}</div>
-
-const Button = ({onClick, text}) => (
-  <button onClick={onClick}>
-    {text}
-  </button>
-)
-
-
-const App = props => {
-  const [value, setValue] = useState(10)
-
-  const updateVal = (val) => () => setValue(val)
+const App = (props) => {
+  const { notes } = props
 
   return (
     <div>
-      <Display value={value}/>
-      <Button onClick={updateVal(1000)} text="set to 1k" />
-      <Button onClick={updateVal(0)} text="set to zero" />
-      <Button onClick={updateVal(value + 1)} text="increment" />
-
+      <h1>Notes</h1>
+      <ul>
+        <li>{notes[0].content}</li>
+        <li>{notes[1].content}</li>
+        <li>{notes[2].content}</li>
+      </ul>
     </div>
   )
 }
 
 ReactDOM.render(
-  <App />, 
+  <App notes={notes} />,
   document.getElementById('root')
 )
