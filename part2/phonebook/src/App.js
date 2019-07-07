@@ -1,18 +1,37 @@
 import React, { useState, useEffect } from "react";
 import phoneService from "./services/phones";
 
-const deleteAction = (id, setPersons, persons) => event => {
+const deleteAction = (id, setPersons, persons, displayMessage, displayError) => event => {
   event.preventDefault();
+  const deleteCandidate = get(id, persons);
   if (
-    window.confirm(`Im about to delete ${get(id, persons).name}, are you sure?`)
+    window.confirm(`Im about to delete ${deleteCandidate.name}, are you sure?`)
   ) {
-    phoneService.deletePhone(id).then(_ => {
+    phoneService.deletePhone(id)
+    .then(_ => {
+      setPersons(persons.filter(x => x.id !== id));
+      displayMessage(`${deleteCandidate.name} was deleted succesfully!`)
+    })
+    .catch(_ => {
+      displayError(`Failed to delete ${deleteCandidate.name}. Already deleted?`)
       setPersons(persons.filter(x => x.id !== id));
     });
   }
 };
 
-const DisplayNumbers = ({ persons, setPersons, personsFiltered }) => {
+const DisplayMessage = ({text, stylingClass}) => {
+  if (text === null) {
+    return null
+  } else {
+    return (
+      <div className={stylingClass}>
+        <em>{text}</em>
+      </div>
+    )
+  }
+}
+
+const DisplayNumbers = ({ persons, setPersons, personsFiltered, displayMessage, displayError }) => {
   return (
     <div>
       <h2>Numbers</h2>
@@ -20,7 +39,7 @@ const DisplayNumbers = ({ persons, setPersons, personsFiltered }) => {
         {personsFiltered.map(x => (
           <li key={x.name}>
             {x.name} {x.phone}{" "}
-            <button onClick={deleteAction(x.id, setPersons, persons)}>
+            <button onClick={deleteAction(x.id, setPersons, persons, displayMessage, displayError)}>
               delete
             </button>
           </li>
@@ -88,6 +107,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [filter, setFilter] = useState("");
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     phoneService.getAll().then(allPhones => {
@@ -103,6 +124,7 @@ const App = () => {
         setPersons(persons.concat(newEnty));
         setNewName("");
         setNewPhone("");
+        temporaryDisplay(setMessage)(`${newPerson.name} was added to the phonebook!`)
       });
     } else {
       // window.alert(`${newName} already exists in phonebook`);
@@ -113,11 +135,22 @@ const App = () => {
             setPersons(persons.filter(x => x.id !== oldPerson.id).concat(newEnty))
             setNewName("");
             setNewPhone("");
+            temporaryDisplay(setMessage)(`${newPerson.name} phone was updated to ${newPerson.phone}`)
           }
           )
+          .catch(_ => {
+            temporaryDisplay(setError)(`${newPerson.name} phone was deleted from server`)
+          })
       }
     }
   };
+
+  const temporaryDisplay =  setter => text => {
+    setter(text)
+    setTimeout(() => {
+      setter(null)
+    }, 3000)
+  }
 
   const getFiltered = value => {
     const regexp = new RegExp(`.*${value}.*`, "i");
@@ -131,6 +164,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <DisplayMessage text={error} stylingClass='error'/>
+      <DisplayMessage text={message} stylingClass='message'/>
       <Filter filter={filter} filterChanged={setFilter} />
       <h3>Add a new</h3>
       <PersonForm
@@ -144,6 +179,8 @@ const App = () => {
         personsFiltered={getFiltered(filter)}
         setPersons={setPersons}
         persons={persons}
+        displayMessage={temporaryDisplay(setMessage)}
+        displayError={temporaryDisplay(setError)}
       />
     </div>
   );
